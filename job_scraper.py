@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 28 11:35:04 2020
+Created on Tue May 10 2020
 
-@author: chrislovejoy
+@author: Saurabh Shah
 """
 
 
@@ -16,6 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import pandas as pd
 import os
 
+print("job_scraper Execution Starts Here!")
 
 def find_jobs_from(website, job_title, location, desired_characs, filename="results.xls"):    
     """
@@ -30,11 +31,17 @@ def find_jobs_from(website, job_title, location, desired_characs, filename="resu
         - Filename: to specify the filename and format of the output.
             Default is .xls file called 'results.xls'
     """
+
+    print("I am inside Function!")
+    print("find_jobs_from")
     
     if website == 'Indeed':
+        print(job_title + " " + location)
         job_soup = load_indeed_jobs_div(job_title, location)
         jobs_list, num_listings = extract_job_information_indeed(job_soup, desired_characs)
     
+#    print("I am Here-G!")
+
     if website == 'CWjobs':
         location_of_driver = os.getcwd()
         driver = initiate_driver(location_of_driver, browser='chrome')
@@ -42,14 +49,21 @@ def find_jobs_from(website, job_title, location, desired_characs, filename="resu
         jobs_list, num_listings = extract_job_information_cwjobs(job_soup, desired_characs)
     
     save_jobs_to_excel(jobs_list, filename)
- 
+    
+#    print("I am Here-H!")
+    
     print('{} new job postings retrieved from {}. Stored in {}.'.format(num_listings, 
                                                                           website, filename))
+    
+#    print("I am Here-I!")   
     
 
 ## ======================= GENERIC FUNCTIONS ======================= ##
 
+#print("I am Here-1!")
+
 def save_jobs_to_excel(jobs_list, filename):
+    print("save_jobs_to_excel")
     jobs = pd.DataFrame(jobs_list)
     jobs.to_excel(filename)
 
@@ -57,7 +71,10 @@ def save_jobs_to_excel(jobs_list, filename):
 
 ## ================== FUNCTIONS FOR INDEED.CO.UK =================== ##
 
+#print("I am Here-2!")
+
 def load_indeed_jobs_div(job_title, location):
+    print("load_indeed_jobs_div")
     getVars = {'q' : job_title, 'l' : location, 'fromage' : 'last', 'sort' : 'date'}
     url = ('https://www.indeed.co.uk/jobs?' + urllib.parse.urlencode(getVars))
     page = requests.get(url)
@@ -65,7 +82,10 @@ def load_indeed_jobs_div(job_title, location):
     job_soup = soup.find(id="resultsCol")
     return job_soup
 
+#print("I am Here-3!")
+
 def extract_job_information_indeed(job_soup, desired_characs):
+    print("extract_job_information_indeed")
     job_elems = job_soup.find_all('div', class_='jobsearch-SerpJobCard')
      
     cols = []
@@ -109,21 +129,28 @@ def extract_job_information_indeed(job_soup, desired_characs):
     
     return jobs_list, num_listings
 
+#print("I am Here-4!")
 
 def extract_job_title_indeed(job_elem):
     title_elem = job_elem.find('h2', class_='title')
     title = title_elem.text.strip()
     return title
 
+#print("I am Here-5!")
+
 def extract_company_indeed(job_elem):
     company_elem = job_elem.find('span', class_='company')
     company = company_elem.text.strip()
     return company
 
+#print("I am Here-6!")
+
 def extract_link_indeed(job_elem):
     link = job_elem.find('a')['href']
     link = 'www.Indeed.co.uk/' + link
     return link
+
+#print("I am Here-7!")
 
 def extract_date_indeed(job_elem):
     date_elem = job_elem.find('span', class_='date')
@@ -134,6 +161,7 @@ def extract_date_indeed(job_elem):
 
 ## ================== FUNCTIONS FOR CWJOBS.CO.UK =================== ##
     
+#print("I am Here-8!")
 
 def initiate_driver(location_of_driver, browser):
     if browser == 'chrome':
@@ -146,7 +174,10 @@ def initiate_driver(location_of_driver, browser):
         driver = webdriver.Edge(executable_path=(location_of_driver + "/edgedriver"))
     return driver
 
+#print("I am Here-9!")
+
 def make_job_search(job_title, location, driver):
+    print("make_job_search")
     driver.get('https://www.cwjobs.co.uk/')
     
     # Select the job box
@@ -173,9 +204,10 @@ def make_job_search(job_title, location, driver):
     
     return job_soup
 
+#print("I am Here-A!")
 
 def extract_job_information_cwjobs(job_soup, desired_characs):
-    
+    print("extract_job_information_cwjobs")
     job_elems = job_soup.find_all('div', class_="job")
      
     cols = []
@@ -219,23 +251,32 @@ def extract_job_information_cwjobs(job_soup, desired_characs):
     
     return jobs_list, num_listings
 
+#print("I am Here-B!")
 
 def extract_job_title_cwjobs(job_elem):
     title_elem = job_elem.find('h2')
     title = title_elem.text.strip()
     return title
+
+#print("I am Here-C!")
  
 def extract_company_cwjobs(job_elem):
     company_elem = job_elem.find('h3')
     company = company_elem.text.strip()
     return company
 
+#print("I am Here-D!")
+
 def extract_link_cwjobs(job_elem):
     link = job_elem.find('a')['href']
     return link
+
+#print("I am Here-E!")
 
 def extract_date_cwjobs(job_elem):
     link_elem = job_elem.find('li', class_='date-posted')
     link = link_elem.text.strip()
     return link
+
+print("job_scraper Execution Ends Here!")
 
